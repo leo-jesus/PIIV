@@ -52,13 +52,12 @@ UsuarioSchema.methods.setSenha = function (password) {
     .toString("hex");
 };
 
-UsuarioSchema,
-  (methods.validarSenha = function (password) {
-    const hash = crypto
-      .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
-      .toString("hex");
-    return hash === this.hash;
-  });
+UsuarioSchema.methods.validarSenha = function (password) {
+  const hash = crypto
+    .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
+    .toString("hex");
+  return hash === this.hash;
+};
 
 UsuarioSchema.methods.gerarToken = function () {
   const hoje = new Date();
