@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Usuario = mongoose.model("Usuario");
-//const enviarEmailRecovery = require("../helpers/email-recovery");
+const enviarEmailRecovery = require("../helpers/email-recovery");
 
 class UsuarioController {
   //GET /
@@ -140,7 +140,12 @@ class UsuarioController {
         return usuario
           .save()
           .then(() => {
-            return res.render("recovery", { error: null, success: true });
+            //return res.render("recovery", { error: null, success: true });
+            enviarEmailRecovery(
+              { usuario, recovery: recoveryData },
+              ((error = null), (success = null)),
+            );
+            return res.render("recovery", { error, success });
           })
           .catch(next);
       })
