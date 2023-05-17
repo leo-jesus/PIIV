@@ -25,7 +25,11 @@ app.use("/public/images", express.static(__dirname + "/public/images"));
 
 const dbs = require("./config/database");
 const dbURI = isProduction ? dbs.dbProduction : dbs.dbTest;
-mongoose.connect(dbURI, { useNewUrlParser: true });
+mongoose.connect(dbURI, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useCreateIndex: true,
+});
 
 //setup da view
 app.set("view engine", "ejs");
@@ -49,7 +53,7 @@ app.use("/", require("./routes"));
 //404 - ROTA
 
 app.use((req, res, next) => {
-  const err = new Error("not Found");
+  const err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
@@ -58,11 +62,11 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   if (err.status !== 404) console.warn("Error: ", err.message, new Date());
-  res.json({ errors: { message: err.message, status: err.status } });
+  res.json(err);
 });
 
 //listen
 app.listen(PORT, (err) => {
   if (err) throw err;
-  console.log(`running at //localhost:${PORT}`);
+  console.log(`running at //127.0.0.1:${PORT}`);
 });

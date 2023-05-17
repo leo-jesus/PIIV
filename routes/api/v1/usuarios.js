@@ -5,7 +5,7 @@ const usuarioController = new UsuarioController();
 
 //post para envio de dados para o server
 router.post("/login", usuarioController.login);
-router.post("/register", usuarioController.store);
+router.post("/registrar", usuarioController.store);
 router.put("/", auth.required, usuarioController.update);
 router.delete("/", auth.required, usuarioController.remove);
 
@@ -18,6 +18,5 @@ router.post("/senha-recuperada", usuarioController.completeRecovery);
 
 //gets decoleta de dados do server
 router.get("/", auth.required, usuarioController.index);
-router.get("/:id", auth.required, usuarioController.show);
 
 module.exports = router;

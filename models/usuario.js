@@ -1,32 +1,35 @@
-const mongoose = require("mongoose"),
-  Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 const uniqueValidator = require("mongoose-unique-validator");
 const crypto = require("crypto");
+// const jwt = require("express-jwt");
 const jwt = require("jsonwebtoken");
+
 const secret = require("../config").secret;
 
 const UsuarioSchema = new mongoose.Schema(
   {
     nome: {
       type: String,
-      required: [true, "não pode permanecer vazio"],
+      required: [true, "não pode ficar vazio."],
     },
     email: {
       type: String,
       lowercase: true,
       unique: true,
-      required: [true, "não pode permanecer vazio"],
+      required: [true, "não pode ficar vazio."],
       index: true,
-      match: [/\S+@\S+\.\S+/, "é inválido"],
+      match: [/\S+@\S+\.\S+/, "é inválido."],
     },
     loja: {
       type: Schema.Types.ObjectId,
-      ref: "Loja",
-      required: [true, "não pode permanecer vazio"],
+      //type: String,
+      ref: "loja",
+      required: [true, "não pode ficar vazia."],
     },
     permissao: {
       type: Array,
-      default: ["Cliente"],
+      default: ["cliente"],
     },
     hash: String,
     salt: String,
@@ -38,12 +41,10 @@ const UsuarioSchema = new mongoose.Schema(
       default: {},
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-UsuarioSchema.plugin(uniqueValidator, { message: "já Está sendo Utilizado" });
+UsuarioSchema.plugin(uniqueValidator, { message: "já está sendo utilizado" });
 
 UsuarioSchema.methods.setSenha = function (password) {
   this.salt = crypto.randomBytes(16).toString("hex");
@@ -61,8 +62,9 @@ UsuarioSchema.methods.validarSenha = function (password) {
 
 UsuarioSchema.methods.gerarToken = function () {
   const hoje = new Date();
-  const exp = new Date(today);
-  exp.setDate(today.getDate() + 15);
+  const exp = new Date(hoje);
+  exp.setDate(hoje.getDate() + 15);
+
   return jwt.sign(
     {
       id: this._id,
@@ -76,6 +78,7 @@ UsuarioSchema.methods.gerarToken = function () {
 
 UsuarioSchema.methods.enviarAuthJSON = function () {
   return {
+    _id: this._id,
     nome: this.nome,
     email: this.email,
     loja: this.loja,
@@ -84,7 +87,7 @@ UsuarioSchema.methods.enviarAuthJSON = function () {
   };
 };
 
-//recuperação de senha
+// RECUPERACAO
 UsuarioSchema.methods.criarTokenRecuperacaoSenha = function () {
   this.recovery = {};
   this.recovery.token = crypto.randomBytes(16).toString("hex");
