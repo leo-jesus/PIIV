@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Usuario = mongoose.model("Usuario");
 const enviarEmailRecovery = require("../helpers/email-recovery");
-const error = require("mongoose/lib/error");
 
 class UsuarioController {
   // GET /
@@ -37,19 +36,17 @@ class UsuarioController {
   // POST /registrar
   store(req, res, next) {
     const { nome, email, password, loja } = req.body;
-    if (!nome || !email || !password || !loja)
-      return res.status(401).json({ errors: "Usuario não registrado" });
 
-    const usuario = new Usuario({
-      nome,
-      email,
-      loja: mongoose.Types.ObjectId(),
-    });
+    const usuario = new Usuario({ nome, email, loja });
     usuario.setSenha(password);
+
     usuario
       .save()
       .then(() => res.json({ usuario: usuario.enviarAuthJSON() }))
-      .catch(next);
+      .catch((err) => {
+        console.log(err);
+        next(err);
+      });
   }
 
   // PUT /
